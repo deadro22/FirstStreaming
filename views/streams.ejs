@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Streams</title>
+    <style>
+      * {
+        color: white;
+        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+          "Lucida Sans", Arial, sans-serif;
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        background-color: rgb(15, 15, 15);
+      }
+      video {
+        width: 100%;
+        max-width: 400px;
+        background: black;
+      }
+      #stream_btn {
+        background-color: #323234;
+        outline: none;
+        border: none;
+        border-radius: 5px;
+        padding: 1em;
+      }
+      .streamsHolder {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .str_elem {
+        margin: 0.5em;
+        width: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="streamsHolder">
+      <%if(Object.keys(streamsCurrent).length === 0){%>
+      <h2>No streams</h2>
+      <%}else{%> <%Object.keys(streamsCurrent["live"]).forEach((stream)=>{%>
+      <div class="str_elem">
+        <video src=""></video>
+        <p>Stream <a href="/stream/<%=stream%>"><%= stream %></a></p>
+        <p>Views</p>
+      </div>
+      <%})%> <%}%>
+    </div>
+  </body>
+</html>

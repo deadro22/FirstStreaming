@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stream:<%= roomId%></title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"
+      integrity="sha512-v8ng/uGxkge3d1IJuEo6dJP8JViyvms0cly9pnbfRxT6/31c3dRWxIiwGnMSWwZjHKOuY3EVmijs7k1jz/9bLA=="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const socket = io("/");
+      setInterval(() => {
+        socket.emit("currentViews");
+      }, 3000);
+      socket.on("currentViews", (views) => {
+        document.getElementById("viewsCount").innerText = views;
+      });
+      $(() => {
+        const streamId = "<%=roomId%>";
+        socket.emit("stream-join", streamId);
+        socket.on("clear-message", () => {
+          $("#st_msg_in").val("");
+        });
+        socket.on("stream-shared", (message, user) => {
+          $("#strChatMessages").append(`<div class="str_message">
+            <p>${user}: </p>
+            <p>${message}</p>
+          </div>`);
+        });
+      });
+    </script>
+    <style>
+      * {
+        color: white;
+        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+          "Lucida Sans", Arial, sans-serif;
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        background-color: rgb(15, 15, 15);
+      }
+      video {
+        width: 100%;
+        max-width: 1500px;
+        background: black;
+      }
+      #stream_btn {
+        background-color: #323234;
+        outline: none;
+        border: none;
+        border-radius: 5px;
+        padding: 1em;
+      }
+      #stream_btn:hover {
+        cursor: pointer;
+        background-color: #404042;
+      }
+      .streamHolder {
+        width: 100%;
+        max-width: 1500px;
+        position: relative;
+      }
+      #streamStats {
+        position: absolute;
+        top: 40%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .streamMain {
+        display: flex;
+      }
+      .streamChat {
+        background-color: #18181b;
+        position: fixed;
+        width: 380px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        right: 0;
+        margin: 0;
+        border-left: 0.5px solid rgba(93, 93, 93, 0.603);
+      }
+      .streamChatFr {
+        margin: 0.5em;
+        margin-top: auto;
+        border-top: 0.5px solid rgb(93, 93, 93);
+        padding-top: 0.5em;
+        display: flex;
+        flex-direction: column;
+      }
+      .streamChatFr > input {
+        border: none;
+        outline: none;
+        background-color: #3a3a3d;
+        padding: 1em;
+        width: 100%;
+        border-radius: 5px;
+      }
+      .streamChatFr > button {
+        margin-left: auto;
+        margin-top: 10px;
+      }
+      .streamChat {
+        padding: 0.5em;
+      }
+      .str_message {
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .str_message > p:nth-child(1) {
+        color: rgb(224, 28, 192);
+        font-weight: 900;
+      }
+      .out-stream {
+        padding: 1em;
+        font-size: 15px;
+      }
+      .str_stats {
+        color: red;
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdn.bootcss.com/flv.js/1.5.0/flv.min.js"></script>
+    <div class="streamMain">
+      <div class="streamHolder">
+        <video id="videoElement" autoplay muted></video>
+      </div>
+      <div class="streamChat">
+        <div class="streamChatInMessages" id="strChatMessages">
+          <h3
+            style="
+              font-weight: 800;
+              text-align: center;
+              border-bottom: 0.5px solid rgb(93, 93, 93);
+              padding-bottom: 0.5em;
+              margin-bottom: 0.5em;
+            "
+          >
+            Stream Chat
+          </h3>
+        </div>
+        <div class="streamChatFr">
+          <input type="text" placeholder="Your Message" id="st_msg_in" />
+          <button id="stream_btn" onclick="sendMessage()">Chat</button>
+        </div>
+      </div>
+    </div>
+    <div class="out-stream">
+      <div class="str_stats">
+        <i class="fa fa-user" style="color: red"></i>
+        <p
+          id="viewsCount"
+          style="
+            color: red;
+            font-size: 18px;
+            font-weight: 900;
+            margin-left: 10px;
+          "
+        >
+          0
+        </p>
+        <button
+          onclick="muteStream()"
+          id="stream_btn"
+          style="padding: 10px; margin-left: 10px"
+        >
+          <i class="fa fa-volume-up"></i>
+        </button>
+        <button
+          onclick="fullScreenToggle()"
+          id="stream_btn"
+          style="padding: 10px; margin-left: 10px"
+        >
+          <i class="fa fa-window-maximize"></i>
+        </button>
+      </div>
+      <h2>stream id: <%= roomId %></h2>
+
+      <p>
+        Put this id in your obs stream key and send this link to everyone to
+        watch you
+      </p>
+    </div>
+    <script>
+      function sendMessage() {
+        const message = document.getElementById("st_msg_in").value;
+        if (message !== "") {
+          socket.emit("stream-message", message, "guest");
+        }
+      }
+      if (flvjs.isSupported()) {
+        var videoElement = document.getElementById("videoElement");
+        var flvPlayer = flvjs.createPlayer({
+          type: "flv",
+          url: "http://192.168.1.7:8000/live/<%= roomId %>.flv",
+        });
+        flvPlayer.attachMediaElement(videoElement);
+        flvPlayer.load();
+        flvPlayer.play();
+      }
+      function muteStream() {
+        var videoElement = document.getElementById("videoElement");
+        if (videoElement.muted) {
+          videoElement.muted = false;
+        } else {
+          videoElement.muted = true;
+        }
+      }
+      async function fullScreenToggle() {
+        const video = document.getElementById("videoElement");
+        await video.requestFullscreen();
+      }
+    </script>
+  </body>
+</html>
