@@ -19,16 +19,6 @@ const config = {
     allow_origin: "*",
     mediaroot: "./media",
   },
-  trans: {
-    ffmpeg: "/bin/ffmpeg",
-    tasks: [
-      {
-        app: "live",
-        mp4: true,
-        mp4Flags: "[movflags=frag_keyframe+empty_moov]",
-      },
-    ],
-  },
 };
 
 app.set("view engine", "ejs");
@@ -65,4 +55,4 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000);
+server.listen(process.env.PORT || 3000);
